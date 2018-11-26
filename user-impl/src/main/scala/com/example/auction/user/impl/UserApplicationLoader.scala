@@ -1,5 +1,8 @@
 package com.example.auction.user.impl
 
+import akka.management.AkkaManagement
+import akka.management.cluster.ClusterHttpManagement
+import akka.management.cluster.bootstrap.ClusterBootstrap
 import com.example.auction.user.api.UserService
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.persistence.cassandra.CassandraPersistenceComponents
@@ -12,6 +15,12 @@ abstract class UserApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents
     with CassandraPersistenceComponents {
+
+
+  AkkaManagement(actorSystem).start()
+  ClusterBootstrap(actorSystem).start()
+  ClusterHttpManagement(actorSystem)
+
 
   override lazy val lagomServer = serverFor[UserService](wire[UserServiceImpl])
   override lazy val jsonSerializerRegistry = UserSerializerRegistry

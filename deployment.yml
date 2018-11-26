@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: userImpl-application
+  name: userimpl 
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: userImpl-application
+  template:
+    metadata:
+      labels:
+        app: userImpl-application
+        actorSystemName: userImpl-application
+    spec:
+      containers:
+      - name: userimpl 
+        image: sebastianharko/userimpl:latest
+        imagePullPolicy: Always
+        ports:
+        - name: remoting
+          containerPort: 2552
+          protocol: TCP
+        - name: management
+          containerPort: 8558
+          protocol: TCP
+        - name: http
+          containerPort: 9000
+          protocol: TCP
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: searchImpl-application
+  name: searchimpl
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: searchImpl-application
+  template:
+    metadata:
+      labels:
+        app: searchImpl-application
+        actorSystemName: searchImpl-application
+    spec:
+      containers:
+      - name: searchimpl
+        image: sebastianharko/searchimpl:latest
+        imagePullPolicy: Always
+        ports:
+        - name: remoting
+          containerPort: 2552
+          protocol: TCP
+        - name: management
+          containerPort: 8558
+          protocol: TCP
+        - name: http
+          containerPort: 9000
+          protocol: TCP
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace

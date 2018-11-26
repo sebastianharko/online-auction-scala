@@ -20,6 +20,16 @@ val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 val scalaTestPlusPlay = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 val mockito = "org.mockito" % "mockito-core" % "2.22.0" % Test
 
+lazy val common = (project in file("common"))
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-http" % "10.0.14",
+      "com.lightbend.akka.management" %% "akka-management" % "0.19.0",
+      "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % "0.19.0",
+      "com.lightbend.akka.management" %% "akka-management-cluster-http" % "0.19.0",
+      "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % "0.19.0"
+    )
+  )
 
 lazy val security = (project in file("security"))
   .settings(commonSettings: _*)
@@ -97,7 +107,7 @@ lazy val searchApi = (project in file("search-api"))
 lazy val searchImpl = (project in file("search-impl"))
   .settings(commonSettings: _*)
   .enablePlugins(LagomScala, SbtReactiveAppPlugin)
-  .dependsOn(searchApi, itemApi, biddingApi)
+  .dependsOn(searchApi, itemApi, biddingApi, common)
   .settings(
     libraryDependencies ++= Seq(
       lagomScaladslPersistenceCassandra,
@@ -106,7 +116,7 @@ lazy val searchImpl = (project in file("search-impl"))
       macwire,
       scalaTest
     )
-  )
+)
 
 lazy val transactionApi = (project in file("transaction-api"))
   .settings(commonSettings: _*)
@@ -147,9 +157,10 @@ lazy val userApi = (project in file("user-api"))
 lazy val userImpl = (project in file("user-impl"))
   .settings(commonSettings: _*)
   .enablePlugins(LagomScala, SbtReactiveAppPlugin)
-  .dependsOn(userApi)
+  .dependsOn(userApi, common)
   .settings(
-    libraryDependencies ++= Seq(
+    resolvers += "dnvriend" at "http://dl.bintray.com/dnvriend/maven",
+      libraryDependencies ++= Seq(
       lagomScaladslPersistenceCassandra,
       macwire,
       scalaTest
@@ -167,9 +178,7 @@ lazy val webGateway = (project in file("web-gateway"))
       scalaTest,
       scalaTestPlusPlay,
       mockito,
-
       "org.ocpsoft.prettytime" % "prettytime" % "3.2.7.Final",
-
       "org.webjars" % "foundation" % "6.2.3",
       "org.webjars" % "foundation-icon-fonts" % "d596a3cfb3"
     ),
